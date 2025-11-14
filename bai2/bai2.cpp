@@ -4,13 +4,6 @@
 #include <fstream>
 #include <chrono> 
 
-// using std::cout;
-// using std::endl;
-// using std::chrono::high_resolution_clock;
-// using std::chrono::duration_cast;
-// using std::chrono::microseconds;
-// using std::chrono::milliseconds;
-
 using namespace std;
 
 struct GcdResult;
@@ -40,8 +33,7 @@ class BigInt {
 
         static GcdResult extendedEuclidean(BigInt a, BigInt b);
         static BigInt modInverse(BigInt e, BigInt phi);
-        string toHex();
-        string toBin();
+        string toHexReverse();
 };
 
 struct GcdResult {
@@ -96,18 +88,7 @@ BigInt::BigInt(string hexStr) : isNegative(0) {
 
 }
 
-string BigInt::toBin() {
-    if (bin.empty()) {
-        return "0";
-    }
-    string binStr = "";
-    for (bool i : this->bin) {
-        binStr += to_string(i);
-    }
-    return binStr;
-}
-
-string BigInt::toHex() {
+string BigInt::toHexReverse() {
     if (bin.empty()) {
         return "0";
     }
@@ -119,7 +100,7 @@ string BigInt::toHex() {
         bin.insert(bin.begin(), 0);
     }
 
-    for (int i = 0; i < bin.size(); i+=4) {
+    for (int i = 0; i < bin.size() - 1; i += 4) {
         int val = 0;
         val += this->bin[i] * 8;
         val += this->bin[i + 1] * 4;
@@ -129,7 +110,11 @@ string BigInt::toHex() {
         hexStr.push_back(hexChars[val]);
     }
 
-    return hexStr;
+    string reversed = "";
+    for (int i = hexStr.size() - 1; i >= 0; --i) {
+        reversed.push_back(hexStr[i]);
+    }
+    return reversed;
 
 }
 
@@ -461,7 +446,6 @@ BigInt BigInt::modInverse(BigInt e, BigInt phi) {
 }
 
 int main(int argc, char *argv[]) {
-    // auto start = high_resolution_clock::now();
     ifstream in(argv[1]);
     ofstream out(argv[2]);
 
@@ -495,7 +479,7 @@ int main(int argc, char *argv[]) {
         if (d == negOne) {
             out << -1 << endl;
         } else {
-            string d_hex = d.toHex();
+            string d_hex = d.toHexReverse();
             out << d_hex << endl;
         }
 
@@ -508,15 +492,5 @@ int main(int argc, char *argv[]) {
     in.close();
     out.close();
 
-    // auto stop = high_resolution_clock::now();
-    // // Tính theo micro giây (một phần triệu giây)
-    // auto duration_us = duration_cast<microseconds>(stop - start);
-    
-    // // Tính theo mili giây (một phần nghìn giây)
-    // auto duration_ms = duration_cast<milliseconds>(stop - start);
-
-    // cout << "--- Thoi gian chay ---" << endl;
-    // cout << "Microseconds: " << duration_us.count() << " micros" << endl;
-    // cout << "Milliseconds: " << duration_ms.count() << " ms" << endl;
     return 0;
 }
